@@ -649,6 +649,9 @@ end
 --- This is a module-specific variant of "remove to trash".
 --- Target directory is 'mini.files/trash' inside standard path of Neovim data
 --- directory (execute `:echo stdpath('data')` to see its path in your case).
+
+--- `options.respect_root` is a boolean indicating whether to stop navigation
+--- at the current working directory. Default value is false.
 ---
 --- # Windows ~
 ---
@@ -699,6 +702,8 @@ MiniFiles.config = {
     permanent_delete = true,
     -- Whether to use for editing directories
     use_as_default_explorer = true,
+    -- Whether to stop navigation by passing the project root
+    respect_root = false,
   },
 
   -- Customization of explorer windows
@@ -982,6 +987,15 @@ end
 MiniFiles.trim_right = function()
   local explorer = H.explorer_get()
   if explorer == nil then return end
+  -- if user set respect_root to true, the left navigation will stop at the project root directory
+  if explorer.opts.options.respect_root then
+    local current_path = MiniFiles.get_fs_entry().path
+    local current_dir = vim.fs.dirname(current_path)
+    if current_dir == vim.fn.getcwd() then
+      return
+    end
+  end
+
 
   explorer = H.explorer_trim_branch_right(explorer)
   H.explorer_refresh(explorer)
@@ -1299,6 +1313,7 @@ H.setup_config = function(config)
   H.check_type('options', config.options, 'table')
   H.check_type('options.use_as_default_explorer', config.options.use_as_default_explorer, 'boolean')
   H.check_type('options.permanent_delete', config.options.permanent_delete, 'boolean')
+  H.check_type('options.respect_root', config.options.respect_root, 'boolean')
 
   H.check_type('windows', config.windows, 'table')
   H.check_type('windows.max_number', config.windows.max_number, 'number')
