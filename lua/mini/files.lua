@@ -650,7 +650,7 @@ end
 --- Target directory is 'mini.files/trash' inside standard path of Neovim data
 --- directory (execute `:echo stdpath('data')` to see its path in your case).
 
---- `options.respect_root` is a boolean indicating whether to stop navigation
+--- `options.respect_root` is a boolean indicating whether to stop navigation upwards
 --- at the current working directory. Default value is false.
 ---
 --- # Windows ~
@@ -987,7 +987,7 @@ end
 MiniFiles.trim_right = function()
   local explorer = H.explorer_get()
   if explorer == nil then return end
-  -- if user set respect_root to true, the left navigation will stop at the project root directory
+  -- if user set respect_root to true, the upward navigation will stop at the current working directory(cwd)
   if explorer.opts.options.respect_root then
     local current_path = MiniFiles.get_fs_entry().path
     local current_dir = vim.fs.dirname(current_path)
